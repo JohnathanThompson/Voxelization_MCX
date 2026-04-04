@@ -1,0 +1,67 @@
+{
+  "Session": {
+    "ID": "result_010",
+    "Photons": 1000000,
+    "Seed": 29012392,
+    "DoMismatch": 1,
+    "DoAutoThread": 1,
+    "SaveDataMask": "dpsp",
+    "OutputFormat": "jnii",
+    "OutputType": "X"
+  },
+  "Forward": {
+    "T0": 0.0,
+    "T1": 5e-09,
+    "Dt": 1e-09
+  },
+  "Optode": {
+    "Source": {
+      "Type": "isotropic",
+      "Pos": [42, 27, 80],
+      "Dir": [0.0, 0.0, 1.0],
+      "Param1": [0.0, 0.0, 0.0, 0.0],
+      "Param2": [0.0, 0.0, 0.0, 0.0]
+    },
+    "Detector": []
+  },
+  "Domain": {
+    "OriginType": 1,
+    "LengthUnit": 0.2,
+    "Media": [
+      {
+        "mua": 0.001,
+        "mus": 1.0,
+        "g": 0.9,
+        "n": 1.0
+      },
+      {
+        "mua": 0.23,
+        "mus": 9.35,
+        "g": 0.99,
+        "n": 1.37
+      }
+    ],
+    "Dim": [
+      83,
+      53,
+      181
+    ],
+    "VolumeFile": "C:/Users/John Thompson/Desktop/Programs/GroupProj/mcx_input_10.bin"
+  },
+  "_metadata": {
+    "origin_world_mm": [
+      -7.054020881652832,
+      -3.7039029598236084,
+      -21.68211555480957
+    ],
+    "resolution_mm": 0.2,
+    "grid_dims": [
+      83,
+      53,
+      181
+    ],
+    "wavelength_nm": 750,
+    "n_vessel_voxels": 31840,
+    "source_file": "SimVascular CFD voxelization"
+  }
+}
