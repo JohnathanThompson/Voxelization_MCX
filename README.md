@@ -1,0 +1,1 @@
+To run full script, run python .\run_full_pipeline.py --input .\result_050.vtu --res 0.2 --pad 4 --photons 10000000 --wavelength 750

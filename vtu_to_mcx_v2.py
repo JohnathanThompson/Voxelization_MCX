@@ -177,7 +177,7 @@ def _read_builtin(filepath: str) -> dict:
 
 def voxelize(points: np.ndarray, resolution: float, padding: int) -> tuple:
     """
-    Convert mesh node cloud → binary voxel grid.
+    Convert mesh node cloud -> binary voxel grid.
 
     Algorithm
     ---------
@@ -224,7 +224,7 @@ def voxelize(points: np.ndarray, resolution: float, padding: int) -> tuple:
 
 
 # ══════════════════════════════════════════════════════════════════════════════
-# 3.  CFD SCALAR → VOXEL GRID  (optional companion export)
+# 3.  CFD SCALAR -> VOXEL GRID  (optional companion export)
 # ══════════════════════════════════════════════════════════════════════════════
 
 def map_scalar(points: np.ndarray, scalar: np.ndarray,
@@ -291,15 +291,37 @@ def build_mcx_json(volume: np.ndarray,
     ----------------------
     The .bin file must be uint8, flattened in column-major (Fortran) order:
       index = ix + nx*(iy + ny*iz)
-    Label 0 → background/air, Label 1 → vessel tissue.
+    Label 0 -> background/air, Label 1 -> vessel tissue.
 
     Returns (mcx_dict, vol_flat_uint8)
     """
     nx, ny, nz = volume.shape
 
-    # Default source: centre of XY, near the -Z face, pointing +Z
+    # Compute optimal source position if not provided
     if srcpos is None:
-        srcpos = [int(nx // 2) + 1, int(ny // 2) + 1, 2]   # 1-indexed for MCX
+        # Find the x,y with the most vessel voxels along z
+        max_vessels = 0
+        best_x, best_y = 0, 0
+        for y in range(ny):
+            for x in range(nx):
+                count = 0
+                for z in range(nz):
+                    if volume[x, y, z] == 1:
+                        count += 1
+                if count > max_vessels:
+                    max_vessels = count
+                    best_x, best_y = x, y
+        # Find min z with vessel at best_x, best_y
+        min_z_vessel = nz
+        for z in range(nz):
+            if volume[best_x, best_y, z] == 1:
+                min_z_vessel = z
+                break
+        source_z = max(0, min_z_vessel - 1)
+        srcpos = [best_x + 1, best_y + 1, source_z + 1]  # 1-indexed
+        print(f"[INFO] Optimal source position: {srcpos} (1-indexed), "
+              f"vessels in path: {max_vessels}")
+
     if srcdir is None:
         srcdir = [0.0, 0.0, 1.0]
 
@@ -413,7 +435,7 @@ def main():
             npy_path = Path(args.output).with_suffix("") \
                            .with_name(Path(args.output).stem + f"_{args.scalar.lower()}.npy")
             np.save(str(npy_path), sv)
-            print(f"[INFO] Scalar map saved → {npy_path}")
+            print(f"[INFO] Scalar map saved -> {npy_path}")
         else:
             print(f"[WARN] Field '{args.scalar}' not found in VTU; skipping.")
 
@@ -421,7 +443,7 @@ def main():
     session_id   = Path(args.input).stem
     out_json     = Path(args.output)
     out_bin      = out_json.with_suffix(".bin")
-    bin_filename = out_bin.name   # relative path for portability
+    bin_filename = str(out_bin.resolve())  # absolute path for portability
 
     srcpos = [float(v) for v in args.srcpos] if args.srcpos else None
     srcdir = [float(v) for v in args.srcdir] if args.srcdir else None
@@ -437,15 +459,15 @@ def main():
     # ── 5. Write outputs ──────────────────────────────────────────────────────
     with open(out_json, "w") as f:
         json.dump(mcx_dict, f, indent=2)
-    print(f"[INFO] MCX JSON    → {out_json}  ({out_json.stat().st_size / 1024:.1f} KB)")
+    print(f"[INFO] MCX JSON    -> {out_json}  ({out_json.stat().st_size / 1024:.1f} KB)")
 
     vol_flat.tofile(str(out_bin))
-    print(f"[INFO] Volume .bin → {out_bin}  ({out_bin.stat().st_size / 1024:.1f} KB)")
+    print(f"[INFO] Volume .bin -> {out_bin}  ({out_bin.stat().st_size / 1024:.1f} KB)")
 
     # ── 6. Print run command ──────────────────────────────────────────────────
     nx, ny, nz = volume.shape
     print()
-    print("═" * 62)
+    print("=" * 62)
     print("  Run MCX:")
     print()
     print(f"    mcx -f {out_json.name} \\")
@@ -453,9 +475,9 @@ def main():
     print(f"        --dim {nx},{ny},{nz} \\")
     print(f"        --gpu 1")
     print()
-    print("  Source is placed at the centre of the volume near the -Z face.")
-    print("  Adjust --srcpos / --srcdir to match your optical setup.")
-    print("═" * 62)
+    print("  Source is placed at the optimal position for maximum absorption.")
+    print("  Adjust --srcpos / --srcdir to override.")
+    print("=" * 62)
 
 
 if __name__ == "__main__":

@@ -7,38 +7,21 @@
     "DoAutoThread": 1,
     "SaveDataMask": "dpsp",
     "OutputFormat": "jnii",
-    "OutputType": "X"
+    "OutputType": "E",
+    "Normalize": 1
   },
   "Forward": {
     "T0": 0.0,
-    "T1": 5e-09,
-    "Dt": 5e-09
+    "T1": 1e10,
+    "Dt": 1e10
   },
   "Optode": {
     "Source": {
       "Type": "pencil",
-      "Pos": [
-        42,
-        27,
-        2
-      ],
-      "Dir": [
-        0.0,
-        0.0,
-        1.0
-      ],
-      "Param1": [
-        0.0,
-        0.0,
-        0.0,
-        0.0
-      ],
-      "Param2": [
-        0.0,
-        0.0,
-        0.0,
-        0.0
-      ]
+      "Pos": [33,23,48],
+      "Dir": [0.0, 0.0, 1.0],
+      "Param1": [0.0, 0.0, 0.0, 0.0],
+      "Param2": [0.0, 0.0, 0.0, 0.0]
     },
     "Detector": []
   },
@@ -59,25 +42,15 @@
         "n": 1.37
       }
     ],
-    "Dim": [
-      83,
-      53,
-      181
-    ],
+    "Dim": [83, 53, 181],
     "VolumeFile": "C:/Users/John Thompson/Desktop/Programs/GroupProj/mcx_input.bin"
   },
   "_metadata": {
     "origin_world_mm": [
-      -7.054020881652832,
-      -3.7039029598236084,
-      -21.68211555480957
+      -7.054020881652832, -3.7039029598236084, -21.68211555480957
     ],
     "resolution_mm": 0.2,
-    "grid_dims": [
-      83,
-      53,
-      181
-    ],
+    "grid_dims": [83, 53, 181],
     "wavelength_nm": 750,
     "n_vessel_voxels": 31840,
     "source_file": "SimVascular CFD voxelization"

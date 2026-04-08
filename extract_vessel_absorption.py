@@ -13,7 +13,7 @@ Usage:
     python extract_vessel_absorption.py \\
         --jnii result_0501.jnii \\
         --volume mcx_input_3.bin \\
-        --dims 60,60,60 \\
+        --dims 60,60 \\
         --plot
 """
 
@@ -23,6 +23,7 @@ import numpy as np
 import zlib
 import base64
 from pathlib import Path
+import datetime
 
 
 def load_jnii(jnii_path):
@@ -121,6 +122,8 @@ def main():
                    help="Output .npy file for absorption map")
     p.add_argument("--plot", action="store_true",
                    help="Generate matplotlib slices and histogram")
+    p.add_argument("--plotdir", default="images",
+                   help="Folder to save the plotted PNG")
     
     args = p.parse_args()
     
@@ -161,12 +164,14 @@ def main():
         print(f"[INFO] Using full absorption field (no masking)")
     
     # Save
-    np.save(str(args.output), result)
-    print(f"[INFO] Saved → {args.output}")
+    output_path = Path(args.output)
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    np.save(str(output_path), result)
+    print(f"[INFO] Saved -> {output_path}")
     
     # Plot if requested
     if args.plot:
-        plot_absorption(result, args.output)
+        plot_absorption(result, output_path, Path(args.plotdir))
     
     print()
     print("="*60)
@@ -175,8 +180,9 @@ def main():
     print("="*60)
 
 
-def plot_absorption(data, label):
+def plot_absorption(data, label_path: Path, plot_dir: Path):
     """Create matplotlib visualization of absorption."""
+    plot_dir.mkdir(parents=True, exist_ok=True)
     try:
         import matplotlib.pyplot as plt
     except ImportError:
@@ -185,7 +191,7 @@ def plot_absorption(data, label):
         return
     
     fig, axes = plt.subplots(2, 2, figsize=(12, 10))
-    fig.suptitle(f"MCX Absorption: {label}", fontsize=14)
+    fig.suptitle(f"MCX Absorption: {label_path.stem}", fontsize=14)
     
     # Three orthogonal slices through center
     nx, ny, nz = data.shape
@@ -226,9 +232,10 @@ def plot_absorption(data, label):
     ax.grid(True, alpha=0.3)
     
     plt.tight_layout()
-    plot_path = Path(label).with_suffix('.png')
+    timestamp = datetime.datetime.now().strftime('%Y%m%d_%H%M%S')
+    plot_path = plot_dir / f"{label_path.stem}_{timestamp}.png"
     plt.savefig(str(plot_path), dpi=100, bbox_inches='tight')
-    print(f"[INFO] Plot saved → {plot_path}")
+    print(f"[INFO] Plot saved -> {plot_path}")
     plt.show()
 
 
