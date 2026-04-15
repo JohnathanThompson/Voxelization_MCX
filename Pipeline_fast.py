@@ -11,7 +11,7 @@ from xml.dom import minidom
 print("=== STEP 1: Meshing ===")
 
 mesher = sv.meshing.TetGen()
-mesher.load_model("/usr/games/JayTee/DemoProject/SVProject/Models/demo.vtp")
+mesher.load_model("/home/john_thompson/projects/CylinderProject/CylinderProject/Models/cylinder.vtp")
 mesher.compute_model_boundary_faces(angle=50.0)
 
 # Print faces so we can confirm IDs
@@ -33,11 +33,11 @@ mesher.generate_mesh(options)
 mesh = mesher.get_mesh()
 
 # Write mesh-complete folder
-mesher.write_mesh("/home/john_thompson/projects/DemoProject/SVProject/Simulations/demojob/mesh-complete/testmesh.vtp")
+mesher.write_mesh("/home/john_thompson/projects/DemoProject/CylinderProject/CylinderProject/Simulations/demojob/mesh-complete/testmesh.vtp")
 print("Mesh written.")
 
 # Print generated surface files
-surfaces_dir = "/home/john_thompson/projects/DemoProject/SVProject/Simulations/demojob/mesh-complete/mesh-surfaces/"
+surfaces_dir = "/home/john_thompson/projects/DemoProject/CylinderProject/CylinderProject/Simulations/demojob/mesh-complete/mesh-surfaces/"
 print("\nSurface files generated:")
 for f in sorted(os.listdir(surfaces_dir)):
     print(f"  {f}")
@@ -47,11 +47,11 @@ for f in sorted(os.listdir(surfaces_dir)):
 # -------------------------------------------------------
 print("\n=== STEP 2: Copying flow file ===")
 
-os.makedirs("/home/john_thompson/projects/DemoProject/SVProject/Simulations2/", exist_ok=True)
+os.makedirs("/home/john_thompson/projects/DemoProject/CylinderProject/CylinderProject/Simulations2/", exist_ok=True)
 
 shutil.copy2(
-    "/home/john_thompson/projects/DemoProject/SVProject/flow-files/steady.flow",
-    "/home/john_thompson/projects/DemoProject/SVProject/Simulations2/steady.flow"
+    "/home/john_thompson/projects/DemoProject/CylinderProject/CylinderProject/flow-files/steady.flow",
+    "/home/john_thompson/projects/DemoProject/CylinderProject/CylinderProject/Simulations2/steady.flow"
 )
 print("Flow file copied.")
 
@@ -90,12 +90,12 @@ ET.SubElement(gen, "Name_prefix_of_saved_VTK_files").text = "result"
 ET.SubElement(gen, "Increment_in_saving_VTK_files").text = "50"       # was 10
 
 mesh_el = ET.SubElement(root, "Add_mesh", name="fluid_mesh")
-ET.SubElement(mesh_el, "Mesh_file_path").text = f"/home/john_thompson/projects/DemoProject/SVProject/Simulations/demojob/mesh-complete/mesh-complete.mesh.vtu"
+ET.SubElement(mesh_el, "Mesh_file_path").text = f"/home/john_thompson/projects/DemoProject/CylinderProject/CylinderProject/Simulations/demojob/mesh-complete/mesh-complete.mesh.vtu"
 
 face_names = ["cap_aorta", "cap_aorta_2", "cap_right_iliac", "wall_aorta", "wall_right_iliac"]
 for face in face_names:
     fe = ET.SubElement(mesh_el, "Add_face", name=face)
-    ET.SubElement(fe, "Face_file_path").text = f"/home/john_thompson/projects/DemoProject/SVProject/Simulations/demojob/mesh-complete/mesh-surfaces/{face}.vtp"
+    ET.SubElement(fe, "Face_file_path").text = f"/home/john_thompson/projects/DemoProject/CylinderProject/CylinderProject/Simulations/demojob/mesh-complete/mesh-surfaces/{face}.vtp"
 
 eq = ET.SubElement(root, "Add_equation", type="fluid")
 ET.SubElement(eq, "Coupled").text = "true"
@@ -130,7 +130,7 @@ for field in ["Velocity", "Pressure", "WSS"]:
 bc_in = ET.SubElement(eq, "Add_BC", name="cap_aorta")
 ET.SubElement(bc_in, "Type").text = "Dirichlet"
 ET.SubElement(bc_in, "Time_dependence").text = "Unsteady"
-ET.SubElement(bc_in, "Temporal_values_file_path").text = "/home/john_thompson/projects/DemoProject/SVProject/flow-files/steady.flow"
+ET.SubElement(bc_in, "Temporal_values_file_path").text = "/home/john_thompson/projects/CylinderProject/CylinderProject/flow-files/steady.flow"
 ET.SubElement(bc_in, "Profile").text = "Parabolic"
 ET.SubElement(bc_in, "Impose_flux").text = "true"
 
